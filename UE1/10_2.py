@@ -13,7 +13,7 @@ left(empty_tree) => None
 '''
 # ------------------------Präsenzübung---------------------------
 def empty_tree():
-  	# Ein einzelnes, leeres Blatt oder die Wurzel eines Baumes.
+    # Ein einzelnes, leeres Blatt oder die Wurzel eines Baumes.
     return {}
 
 
@@ -64,29 +64,60 @@ def height(tree):
     if is_empty_tree(tree):
         return 0
     else:
-        if size(left(tree)) >= size(right()):
+        if size(left(tree)) >= size(right(tree)):
             return 1 + height(left(tree))
         else:
             return 1 + height(right(tree))
+def height(tree):
+    stack = [[tree,0]]
+    max_height = 0
+
+    while len(stack) > 0:
+        tree1 = stack[-1][0]
+        height_left = stack[-1][1]
+
+        while not is_empty_tree(tree1):
+            height_left = height_left + 1
+            stack.append([right(tree1), height_left])
+            tree1 = left(tree1)
+        if height_left > max_height:
+            max_height = height_left
+
+
 
 # Erstellt einen vollständigen Baum mit der Höhe depth und gibt diesen zurück.
 def full_bintree(depth):
-
-    # Hilfsfunktion
-    def full_bintree_helper(index, tree):
-        if index == 0:
-            return tree
-        else:
-            return full_bintree_helper(index-1,node(tree, tree))
-
-    tree = empty_tree()
-
-    return full_bintree_helper(depth, tree)
+    if depth == 0:
+        return {}
+    else:
+        return node(full_bintree(depth-1), full_bintree(depth-1))
 
 
 # Erstellt einen ausgeglichenen Baum mit Höhe depth und gibt diesen zurück.
 def balanced_bintree(size):
+    if size == 0:
+        return {}
+    else:
+        left_elems = size / 2
+        right_elems = size - left_elems
+        return node(balanced_bintree(left_elems), balanced_bintree(right_elems))
 
-
-
+# Schneidet einen Binärbaum auf der Höhe depth an.
 def cut_bintree(tree, depth):
+    if depth == 0:
+        return {}, [left(tree), right(tree)]
+    else:
+        new_left, list_left = cut_bintree(left(tree), depth-1)
+        new_right, list_right = cut_bintree(right(tree), depth-1)
+        return node(new_left, new_right), list_left + list_right
+
+
+# -------------------------------------Testprogramm--------------------------------------------
+
+empty_tree = {}
+bintree = full_bintree(5)
+
+print(height(empty_tree))                   #0
+print(size(empty_tree))                     #0
+print(height(full_bintree(3)))              #3
+print(height(cut_bintree(bintree, 4)[0]))   #4
